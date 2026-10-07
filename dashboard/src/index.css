@@ -1,6 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+    --color-niamind-navy: #0B2545;
+    --color-niamind-teal: #1A7A8A;
+    --color-niamind-green: #1B6E4A;
+    --color-niamind-gold: #C9973A;
+    --color-niamind-coral: #C0392B;
+    --color-niamind-bg: #F7FAFC;
+    --color-niamind-card: #FFFFFF;
+    --color-niamind-text: #111827;
+    --color-niamind-muted: #6B7280;
+    --color-niamind-border: #E5E7EB;
+
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+
+    --shadow-soft: 0 12px 40px rgba(11, 37, 69, 0.12);
+    --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
 
 body {
     background-color: #F4F6F8;
