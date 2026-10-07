@@ -1,0 +1,14 @@
+# Niamind — robots.txt
+# https://niamind.com
+
+User-agent: *
+Allow: /
+
+# Disallow any future auth or dashboard routes from being indexed
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+
+# Sitemap location
+Sitemap: https://niamind.com/sitemap.xml

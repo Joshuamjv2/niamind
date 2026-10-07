@@ -1,0 +1,52 @@
+                ┌──────────────────────────┐
+                │  PEOPLE SEEKING SUPPORT  │
+                └────────────┬─────────────┘
+                             │
+                             │ request support
+                             ▼
+                ┌──────────────────────────┐
+                │  NIAMIND MARKETPLACE     │
+                │  (matching system)       │
+                └────────────┬─────────────┘
+                             │
+              ┌──────────────┴──────────────┐
+              │                             │
+              ▼                             ▼
+┌──────────────────────────┐   ┌──────────────────────────┐
+│   STANDARD SESSION       │   │   ACCESS SESSION          │
+│   (self-funded)          │   │   (barrier removed)       │
+└────────────┬─────────────┘   └────────────┬─────────────┘
+             │                              │
+             │                              │
+             ▼                              ▼
+     ┌────────────────────────────────────────────┐
+     │        VERIFIED PROFESSIONALS              │
+     │                                            │
+     │  earn income + build reputation            │
+     └────────────────────────┬───────────────────┘
+                              │
+                              │ participation (system input)
+                              ▼
+        ┌────────────────────────────────────────┐
+        │     VISIBILITY SYSTEM (RANKING)        │
+        │                                        │
+        │  +2 visibility slots per access session│
+        │  visibility decays over time          │
+        └────────────────────────┬───────────────┘
+                                 │
+                     ┌───────────┴───────────┐
+                     ▼                       ▼
+      ┌──────────────────────────┐  ┌──────────────────────────┐
+      │ PURCHASED VISIBILITY     │  │ ACCESS CONTRIBUTION       │
+      │ (slots bought)           │  │ (sessions completed)      │
+      └────────────┬─────────────┘  └────────────┬─────────────┘
+                   │                              │
+                   └──────────────┬───────────────┘
+                                  ▼
+                    ┌──────────────────────────┐
+                    │ ECOSYSTEM FUNDING LAYER  │
+                    │                          │
+                    │ training, programs,      │
+                    │ awareness, partners      │
+                    └──────────────────────────┘
+                    AWSTemplateFormatVersion: "2010-09-09"

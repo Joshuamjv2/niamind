@@ -1,0 +1,87 @@
+# Niamind
+
+> Life moves better together.
+
+Niamind is a platform where people help each other move forward in life through reflection, connection, and contribution.
+
+It is not a mental health platform. It is not a social network. It is not a productivity tool. It exists to help people navigate life intentionally — alongside others who are doing the same.
+
+Founded in Kampala, Uganda. Built for anyone navigating the quieter, harder parts of being human.
+
+## What Niamind is
+
+Niamind is built around one pattern:
+
+> Reflect → Connect → Contribute → Move Forward
+
+People reflect on where they are. They connect with others navigating similar territory. They contribute what they have learned. In doing so, they move forward — and help others do the same.
+
+Mental health outcomes are a consequence of what happens on Niamind — not the positioning layer.
+
+## Who it is for
+
+Young professionals, broadly 25 to 38, who are doing well by most external measures and privately navigating a thinner inner life than they would like. Their social world has contracted. The conversations that used to hold the real version of them have gotten quieter.
+
+They are not in crisis. They are not looking for therapy. They are looking for somewhere that takes their inner life seriously — and for people doing the same quiet, honest work on themselves.
+
+## Platform layers
+
+**Journey** — A private space for personal reflection. Notes, prompts, weekly intentions, and curated content matched to a member's focus areas. Works as a complete solo experience before community exists.
+
+**Feed** — Populated by Spaces the member has actively joined and Niamind editorial content. Not infinite scroll. Has a natural endpoint. Success is measured by usefulness, not time spent.
+
+**Spaces** — Ongoing communities organised around areas of life people are actively working on. Joined deliberately. Never pushed into a member's experience uninvited. Examples: Confidence, Relationships, Purpose, Entrepreneurship, Emotional Wellbeing, Grief and Loss, Parenting.
+
+**Discussions** — The knowledge layer inside Spaces. Where lived experience becomes useful to others. Questions, reflections, resources, and honest stories.
+
+**Connections** — Mutual, consent-based relationships. Not followers. Not an audience mechanic. Unlock messaging when accepted.
+
+**Guidance Layer** — Verified professionals who earn marketplace visibility through community contribution. Every professional contributes free community sessions before accessing paying clients. Visibility reflects ongoing contribution, not fees paid.
+
+**Community Economy** — Niacoin is the platform's internal currency. Used for Appreciation, paid experiences, Events, and partner contributions. Not crypto. Not earned through participation. Not a status mechanism.
+
+**Trust System** — Slots are the professional visibility mechanism. Earned through community sessions. Cannot be purchased, gifted, or transferred. Visibility decays without ongoing contribution.
+
+**Impact System** — Verified NGOs, hospitals, community programmes, and education initiatives listed on the platform. Contributions recorded on a public ledger. 7% platform fee retained for infrastructure. Everything else goes directly to the organisation.
+
+## Core principles
+
+These apply to every feature and every product decision:
+
+- No follower counts
+- No public popularity rankings
+- No engagement leaderboards
+- No gamification of personal growth
+- No algorithmic attention competition
+- Success is measured by usefulness to the member, not time spent on the platform
+- Niamind surfaces when it has something to give — not when it wants something from you
+
+> Complexity belongs to the system, not the member.
+
+## Build status
+
+| Layer | Status |
+|---|---|
+| Landing page and waitlist | In progress |
+| Journey, Feed, Spaces, Discussions, Connections, Profiles | MVP — in development |
+| Rooms, Events, Messaging | Phase 2 |
+| Professional marketplace | Phase 2 |
+| Niacoin and Appreciation | Phase 2 |
+| Slots and Trust System | Phase 2 |
+| Impact System and Partner Programmes | Phase 2 |
+| Radio | Future |
+
+## Revenue model
+
+- Platform fee on paid professional sessions
+- Platform fee on paid Events and Creator content
+- 7% fee on partner programme contributions
+- Corporate client access for professionals (Phase 2 — requires minimum community contribution threshold)
+
+Niamind does not generate revenue when members spend more time scrolling. It generates revenue when members find enough value to participate more deeply. Value creation comes before value exchange.
+
+## Contact
+
+- Email: contact@niamind.com
+- Location: Kampala, Uganda
+- Website: https://niamind.com

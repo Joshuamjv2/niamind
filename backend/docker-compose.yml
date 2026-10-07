@@ -1,0 +1,223 @@
+version: "3.8"
+
+services:
+  reverse-proxy:
+    image: traefik:v3.1
+    container_name: niamind-traefik
+    restart: always
+
+    command:
+      - "--accesslog=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+
+      # Dashboard
+      - "--api.dashboard=true"
+
+      # HTTP / HTTPS
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+
+      # Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=contact@niamind.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+
+    volumes:
+      - letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    networks:
+      - niamind-network
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: niamind-api
+    restart: always
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    env_file:
+      - .env.production
+
+    expose:
+      - "8000"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.niamind-api.rule=Host(`api.niamind.com`)"
+      - "traefik.http.routers.niamind-api.entrypoints=websecure"
+      - "traefik.http.routers.niamind-api.tls.certresolver=myresolver"
+      - "traefik.http.services.niamind-api.loadbalancer.server.port=8000"
+
+    networks:
+      - niamind-network
+
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: niamind-celery-worker
+    restart: always
+
+    command: >
+      celery
+      -A base.infrastructure.celery.worker
+      worker
+      --loglevel=info
+      --concurrency=4
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    env_file:
+      - .env.production
+
+    networks:
+      - niamind-network
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: niamind-celery-beat
+    restart: always
+
+    command: >
+      celery
+      -A base.infrastructure.celery.worker
+      beat
+      --loglevel=info
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    env_file:
+      - .env.production
+
+    networks:
+      - niamind-network
+
+  flower:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: niamind-flower
+    restart: always
+
+    command: >
+      celery
+      -A base.infrastructure.celery.worker
+      flower
+      --port=5555
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    env_file:
+      - .env.production
+
+    expose:
+      - "5555"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.niamind-flower.rule=Host(`flower.niamind.com`)"
+      - "traefik.http.routers.niamind-flower.entrypoints=websecure"
+      - "traefik.http.routers.niamind-flower.tls.certresolver=myresolver"
+      - "traefik.http.services.niamind-flower.loadbalancer.server.port=5555"
+
+    networks:
+      - niamind-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: niamind-db
+    restart: always
+
+    env_file:
+      - .env.production
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - niamind-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: niamind-redis
+    restart: always
+
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD}
+
+    volumes:
+      - redis-data:/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "${REDIS_PASSWORD}",
+          "ping"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - niamind-network
+
+volumes:
+  postgres-data:
+  redis-data:
+  letsencrypt:
+
+networks:
+  niamind-network:
+    driver: bridge

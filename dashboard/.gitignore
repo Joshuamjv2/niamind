@@ -1,0 +1,5 @@
+tsconfig.tsbuildinfo
+/node_modules
+/brand_kit
+/dist
+/build
