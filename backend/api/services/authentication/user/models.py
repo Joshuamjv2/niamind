@@ -1,15 +1,11 @@
 import enum
 import uuid
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
 
 import phonenumbers
 from sqlalchemy import DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
-
-if TYPE_CHECKING:
-    from api.services.questionaires.models import QuestionnaireSession
+from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from db.base import Base
 
@@ -103,11 +99,6 @@ class User(Base):
         nullable=False,
         default=utc_now,
         onupdate=utc_now,
-    )
-
-    questionnaire_sessions: Mapped[list["QuestionnaireSession"]] = relationship(
-        "QuestionnaireSession",
-        back_populates="user",
     )
 
     @validates("phone_e164")

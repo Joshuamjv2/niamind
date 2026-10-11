@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   reverse-proxy:
     image: traefik:v3.1
@@ -39,7 +37,7 @@ services:
 
   api:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
 
     container_name: niamind-api
@@ -69,7 +67,7 @@ services:
 
   celery-worker:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
 
     container_name: niamind-celery-worker
@@ -96,7 +94,7 @@ services:
 
   celery-beat:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
 
     container_name: niamind-celery-beat
@@ -122,7 +120,7 @@ services:
 
   flower:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
 
     container_name: niamind-flower

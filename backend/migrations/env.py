@@ -6,16 +6,8 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from api.services.authentication.user.models import User
-
 # Import models so their tables are registered with Base.metadata.
-from api.services.questionaires.models import (
-    Answer,
-    Question,
-    Questionnaire,
-    QuestionnaireSession,
-)
-from api.services.waitlist.models import WaitlistEntry
+import db.models  # noqa: F401
 from constants import settings
 from db.base import Base
 

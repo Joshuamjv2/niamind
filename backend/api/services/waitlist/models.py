@@ -1,12 +1,7 @@
 import uuid
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
 
 import phonenumbers
-
-if TYPE_CHECKING:
-    from api.services.questionaires.models import QuestionnaireSession
-
 from sqlalchemy import DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
@@ -84,14 +79,12 @@ class WaitlistEntry(Base):
             self.phone_country_code = None
             self.phone_region = None
             self.phone_national = None
-
             return None
 
         value = str(value).strip()
 
         try:
             parsed_number = phonenumbers.parse(value, None)
-
         except phonenumbers.NumberParseException as exc:
             raise ValueError("A valid international phone number is required, including the country calling code (e.g. +256...).") from exc
 
@@ -104,9 +97,7 @@ class WaitlistEntry(Base):
         )
 
         self.phone_country_code = f"+{parsed_number.country_code}"
-
         self.phone_region = phonenumbers.region_code_for_number(parsed_number) or None
-
         self.phone_national = str(parsed_number.national_number)
 
         return e164

@@ -1,10 +1,4 @@
 import uuid
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from api.services.authentication.user.models import User
-    from api.services.waitlist.models import WaitlistEntry
-
 from datetime import datetime, timezone
 
 from sqlalchemy import (
@@ -75,6 +69,7 @@ class Questionnaire(Base):
     sessions: Mapped[list["QuestionnaireSession"]] = relationship(
         "QuestionnaireSession",
         back_populates="questionnaire",
+        cascade="all, delete-orphan",
     )
 
 
@@ -97,8 +92,7 @@ class Question(Base):
         index=True,
     )
 
-    # Stable semantic identifier.
-    # Examples: "working_on", "focus_areas".
+    # Stable semantic identifier, e.g. "working_on", "focus_areas".
     key: Mapped[str] = mapped_column(
         String,
         nullable=False,
@@ -115,7 +109,7 @@ class Question(Base):
         nullable=True,
     )
 
-    # text | multiselect | single_select
+    # Supported types: text, multiselect, single_select.
     type: Mapped[str] = mapped_column(
         String,
         nullable=False,
@@ -187,20 +181,7 @@ class QuestionnaireSession(Base):
         index=True,
     )
 
-    # Existing registered user.
-    # NULL for anonymous or waitlist respondents.
-    user_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True),
-        ForeignKey(
-            "users.id",
-            ondelete="CASCADE",
-        ),
-        nullable=True,
-        index=True,
-    )
-
-    # Waitlist participant.
-    # NULL for anonymous or registered-user respondents.
+    # NULL means the session is not associated with a waitlist entry.
     waitlist_entry_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey(
@@ -238,11 +219,6 @@ class QuestionnaireSession(Base):
     questionnaire: Mapped["Questionnaire"] = relationship(
         "Questionnaire",
         back_populates="sessions",
-    )
-
-    user: Mapped["User | None"] = relationship(
-        "User",
-        back_populates="questionnaire_sessions",
     )
 
     waitlist_entry: Mapped["WaitlistEntry | None"] = relationship(
