@@ -3,6 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.session import get_session
+
 from ..schemas import (
     QuestionnaireCreate,
     QuestionnaireDetailResponse,
@@ -17,7 +19,6 @@ from ..services.questionnaire import (
     list_questionnaires,
     update_questionnaire,
 )
-from db.session import get_session
 
 # Domain errors (not found -> 404, slug conflict -> 409) are mapped to HTTP
 # responses by the handlers in error_handlers.py, so no try/except is needed here.

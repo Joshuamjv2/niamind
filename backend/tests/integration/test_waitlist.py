@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.services.waitlist.models import WaitlistEntry
 
-
 WAITLIST_URL = "/api/waitlist/"
 
 

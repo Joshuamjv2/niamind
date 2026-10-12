@@ -5,7 +5,6 @@ from uuid import uuid4
 import httpx
 import pytest
 
-
 E2E_BASE_URL = os.getenv(
     "E2E_BASE_URL",
     "http://127.0.0.1:8000",

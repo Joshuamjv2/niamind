@@ -1,16 +1,17 @@
-import db.models  # noqa: F401
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from .services.waitlist.routes import router as waitlist_router
-from .services.questionnaires.routes.questionnaire import router as questionnaires_router
-from .services.questionnaires.error_handlers import register_exception_handlers
 
+import db.models  # noqa: F401
 from constants import settings
 from db.session import get_session
 from redis_client.client import client as redis_client
+
+from .services.questionnaires.error_handlers import register_exception_handlers
+from .services.questionnaires.routes.questionnaire import router as questionnaires_router
+from .services.waitlist.routes import router as waitlist_router
 
 app = FastAPI(
     title=settings.APP_NAME,

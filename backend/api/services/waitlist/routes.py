@@ -20,7 +20,6 @@ from api.services.waitlist.services import (
 )
 from db.session import get_session
 
-
 router = APIRouter(
     prefix="/waitlist",
     tags=["Waitlist"],

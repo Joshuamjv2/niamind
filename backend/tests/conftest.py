@@ -4,12 +4,12 @@ import asyncpg
 import pytest
 import pytest_asyncio
 import redis
-import db.models  # noqa: F401
 from httpx import ASGITransport, AsyncClient
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 
+import db.models  # noqa: F401
 from api.main import app
 from constants import settings
 from db.base import Base
