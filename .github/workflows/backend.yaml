@@ -23,8 +23,7 @@ jobs:
           python-version: "3.12"
 
       - name: Ensure Docker Compose is Available
-        run: |
-          docker compose version
+        run: docker compose version
 
       - name: Install Dependencies
         working-directory: backend
@@ -44,7 +43,10 @@ jobs:
               asyncpg \
               pydantic-settings \
               httpx \
-              redis
+              redis \
+              alembic \
+              fastapi \
+              "uvicorn[standard]"
           fi
 
       - name: Pre-test Lint Check
@@ -53,10 +55,20 @@ jobs:
           ruff check .
           ruff format --check .
 
+      # Start PostgreSQL and Redis before starting FastAPI.
+      - name: Start Test Services
+        working-directory: backend
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgres"
+          POSTGRES_DB: "niamind_test"
+        run: |
+          docker compose -f docker-compose.test.yml up -d --wait
+
       - name: Run Pytest Suite
         working-directory: backend
         env:
-          # ── App ─────────────────────────────────────────────
+          # App
           APP_NAME: "Niamind"
           APP_ENV: "ci"
           API_VERSION: "v1"
@@ -65,57 +77,103 @@ jobs:
           ALLOWED_HOSTS: "localhost,127.0.0.1"
           CORS_ORIGINS: "http://localhost:3000,http://localhost:5173"
 
-          # ── Database ────────────────────────────────────────
+          # Database — CI uses the test database exclusively
           POSTGRES_USER: "postgres"
           POSTGRES_PASSWORD: "postgres"
           POSTGRES_DB: "niamind_test"
-
-          # Tests run on the GitHub runner.
-          # PostgreSQL is provided by docker-compose.test.yml.
           DB_URL: "postgresql+asyncpg://postgres:postgres@localhost:5433/niamind_test"
           TEST_DB_URL: "postgresql+asyncpg://postgres:postgres@localhost:5433/niamind_test"
 
-          # ── Redis ───────────────────────────────────────────
+          # Redis
           REDIS_URL: "redis://:redis_password_123@localhost:6380/0"
           TEST_REDIS_URL: "redis://:redis_password_123@localhost:6380/4"
-
           REDIS_HOST: "localhost"
-          REDIS_PORT: 6380
+          REDIS_PORT: "6380"
           REDIS_PASSWORD: "redis_password_123"
+          REDIS_CACHE_DB: "0"
+          REDIS_PUBSUB_DB: "1"
+          REDIS_CELERY_DB: "2"
+          REDIS_CELERY_RESULTS_DB: "3"
+          REDIS_TEST_DB: "4"
 
-          REDIS_CACHE_DB: 0
-          REDIS_PUBSUB_DB: 1
-          REDIS_CELERY_DB: 2
-          REDIS_CELERY_RESULTS_DB: 3
-          REDIS_TEST_DB: 4
-
-          # ── Celery ──────────────────────────────────────────
+          # Celery
           CELERY_BROKER_URL: "redis://:redis_password_123@localhost:6380/2"
           CELERY_RESULT_BACKEND: "redis://:redis_password_123@localhost:6380/3"
           CELERY_TASK_SERIALIZER: "json"
           CELERY_RESULT_SERIALIZER: "json"
           CELERY_TIMEZONE: "UTC"
 
-          # ── Auth ────────────────────────────────────────────
-          ACCESS_TOKEN_EXPIRE_MINUTES: 30
-          REFRESH_TOKEN_EXPIRE_DAYS: 30
+          # Auth
+          ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+          REFRESH_TOKEN_EXPIRE_DAYS: "30"
           ALGORITHM: "HS256"
 
-          # ── Email ───────────────────────────────────────────
+          # Email
           EMAIL_HOST: ""
-          EMAIL_PORT: 587
+          EMAIL_PORT: "587"
           EMAIL_USERNAME: ""
           EMAIL_PASSWORD: ""
           EMAIL_FROM: "contact@niamind.com"
           EMAIL_TLS: "True"
 
-          # ── Kafka ────────────────────────────────────────────
+          # Kafka
           KAFKA_BOOTSTRAP_SERVERS: "localhost:9092"
           KAFKA_ENABLED: "False"
 
-          # ── Monitoring ──────────────────────────────────────
-          FLOWER_PORT: 5555
+          # Monitoring
+          FLOWER_PORT: "5555"
           SENTRY_DSN: ""
 
         run: |
+          set -e
+
+          # Apply migrations to the CI test database.
+          alembic upgrade head
+
+          # Start FastAPI in the background.
+          uvicorn api.main:app \
+            --host 127.0.0.1 \
+            --port 8000 \
+            > api.log 2>&1 &
+
+          API_PID=$!
+
+          # Stop the server when this step finishes.
+          trap 'kill "$API_PID" 2>/dev/null || true' EXIT
+
+          # Wait for the root endpoint to become reachable.
+          python - <<'PY' || { cat api.log; exit 1; }
+          import time
+          import urllib.request
+
+          url = "http://127.0.0.1:8000/"
+
+          for _ in range(30):
+              try:
+                  with urllib.request.urlopen(url, timeout=2) as response:
+                      if response.status == 200:
+                          print("FastAPI root endpoint is ready.")
+                          break
+              except Exception:
+                  time.sleep(2)
+          else:
+              raise SystemExit(
+                  "FastAPI failed to respond within 60 seconds."
+              )
+          PY
+
+          # Run unit, integration, and E2E tests.
           pytest --cache-clear
+
+      - name: Show API Logs on Failure
+        if: failure()
+        working-directory: backend
+        run: |
+          if [ -f api.log ]; then
+            cat api.log
+          fi
+
+      - name: Stop Test Services
+        if: always()
+        working-directory: backend
+        run: docker compose -f docker-compose.test.yml down -v
