@@ -120,6 +120,7 @@ export function FounderNote() {
 
 export function ClosingCTA({ email, setEmail, onJoin }) {
     const inputRef = useRef(null);
+    // make a post request to join waitlist before calling onjoin
     return (
         <section className="bg-white max-w-none w-full py-24 relative">
             <div className="max-w-2xl mx-auto flex flex-col items-center justify-center">
@@ -136,10 +137,6 @@ export function ClosingCTA({ email, setEmail, onJoin }) {
                         widthClass="w-full max-w-md"
                     />
                 </div>
-
-                <p className="mt-4 text-sm text-niamind-muted hidden">
-                    We'll reach out when it's time. Nothing before then.
-                </p>
             </div>
         </section>
     );

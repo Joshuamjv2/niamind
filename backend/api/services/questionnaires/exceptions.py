@@ -8,3 +8,6 @@ class QuestionnaireSlugConflictError(Exception):
 
 # Add the Question / Session / Answer exceptions here as those services are built,
 # so the routes can map every domain error from a single import.
+
+class QuestionNotFoundError(Exception):
+    """Raised when a questionnaire slug is already in use."""

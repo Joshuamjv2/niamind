@@ -62,6 +62,29 @@ class StrippedModel(BaseModel):
 # Question schemas
 # ---------------------------------------------------------------------------
 
+class QuestionBase(StrippedModel):
+    key: str = Field(min_length=1, max_length=255)
+    text: str = Field(min_length=1)
+    placeholder: str | None = None
+    type: QuestionType = "text"
+    options: list[str] | None = None
+    order: int | None = Field(default=None, ge=0)   # optional for nested create
+    required: bool = False
+    is_active: bool = True
+
+    @field_validator("options")
+    @classmethod
+    def normalize_options(cls, value: list[str] | None) -> list[str] | None:
+        return _normalize_options(value)
+
+    @model_validator(mode="after")
+    def validate_options(self) -> "QuestionBase":
+        if self.type == "text" and self.options:
+            raise ValueError("Text questions cannot have options.")
+        if self.type in ("multiselect", "single_select") and not self.options:
+            raise ValueError("Selection questions must have at least one option.")
+        return self
+
 
 class QuestionCreate(StrippedModel):
     questionnaire_id: UUID
@@ -100,7 +123,7 @@ class QuestionUpdate(StrippedModel):
     key: str | None = Field(default=None, min_length=1, max_length=255)
     text: str | None = Field(default=None, min_length=1)
     placeholder: str | None = None
-    type: QuestionType | None = None
+    # type: QuestionType | None = None
     options: list[str] | None = None
     order: int | None = Field(default=None, ge=0)
     required: bool | None = None
@@ -133,12 +156,23 @@ class QuestionResponse(BaseModel):
 # Questionnaire schemas
 # ---------------------------------------------------------------------------
 
+class QuestionNested(QuestionBase):
+    """Question embedded in a questionnaire create payload."""
+
 
 class QuestionnaireCreate(StrippedModel):
     slug: Slug
     label: str = Field(min_length=1, max_length=255)
     version: int = Field(default=1, ge=1)
     is_active: bool = True
+    questions: list[QuestionNested] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_unique_keys(self) -> "QuestionnaireCreate":
+        keys = [q.key for q in self.questions]
+        if len(keys) != len(set(keys)):
+            raise ValueError("Question keys must be unique within a questionnaire.")
+        return self
 
 
 class QuestionnaireUpdate(StrippedModel):
@@ -190,6 +224,13 @@ class QuestionnaireSessionResponse(BaseModel):
 
 class QuestionnaireSessionComplete(BaseModel):
     completed_gate: bool = True
+
+
+class QuestionnaireListResponse(QuestionnaireResponse):
+    """List response that includes per-questionnaire rollup counts."""
+
+    question_count: int
+    session_count: int
 
 
 # ---------------------------------------------------------------------------

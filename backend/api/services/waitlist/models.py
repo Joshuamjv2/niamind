@@ -1,16 +1,11 @@
 import uuid
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
-
 import phonenumbers
 from sqlalchemy import DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from db.base import Base
-
-if TYPE_CHECKING:
-    from api.services.questionnaires.models import QuestionnaireSession
 
 
 def utc_now() -> datetime:
@@ -69,12 +64,6 @@ class WaitlistEntry(Base):
         DateTime(timezone=True),
         nullable=False,
         default=utc_now,
-    )
-
-    questionnaire_sessions: Mapped[list["QuestionnaireSession"]] = relationship(
-        "QuestionnaireSession",
-        back_populates="waitlist_entry",
-        cascade="all, delete-orphan",
     )
 
     @validates("phone_e164")

@@ -1,15 +1,17 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+from .questions import bulk_create_questions
 
 from ..exceptions import (
     QuestionnaireNotFoundError,
     QuestionnaireSlugConflictError,
 )
-from ..models import Questionnaire
+from ..models import Question, Questionnaire, QuestionnaireSession
 from ..schemas import (
     QuestionnaireCreate,
     QuestionnaireUpdate,
@@ -20,23 +22,35 @@ async def create_questionnaire(
     db: AsyncSession,
     data: QuestionnaireCreate,
 ) -> Questionnaire:
-    """Create a questionnaire with a unique slug."""
-
-    existing = await db.scalar(select(Questionnaire.id).where(Questionnaire.slug == data.slug))
-
+    existing = await db.scalar(
+        select(Questionnaire.id).where(Questionnaire.slug == data.slug)
+    )
     if existing is not None:
-        raise QuestionnaireSlugConflictError(f"A questionnaire with slug '{data.slug}' already exists.")
+        raise QuestionnaireSlugConflictError(
+            f"A questionnaire with slug '{data.slug}' already exists."
+        )
 
-    questionnaire = Questionnaire(**data.model_dump())
+    questionnaire = Questionnaire(
+        **data.model_dump(exclude={"questions"})
+    )
+    db.add(questionnaire)
 
     try:
-        db.add(questionnaire)
+        await db.flush()  # assigns questionnaire.id without committing
+        if data.questions:
+            await bulk_create_questions(
+                db,
+                questionnaire.id,
+                [q.model_dump() for q in data.questions],
+            )
         await db.commit()
-        await db.refresh(questionnaire)
+        await db.refresh(questionnaire, attribute_names=["questions"])
         return questionnaire
     except IntegrityError as exc:
         await db.rollback()
-        raise QuestionnaireSlugConflictError(f"A questionnaire with slug '{data.slug}' already exists.") from exc
+        raise QuestionnaireSlugConflictError(
+            f"A questionnaire with slug '{data.slug}' already exists."
+        ) from exc
     except Exception:
         await db.rollback()
         raise
@@ -115,10 +129,34 @@ async def list_questionnaires(
     is_active: bool | None = None,
     limit: int = 100,
     offset: int = 0,
-) -> list[Questionnaire]:
-    """List questionnaires, optionally filtering by active status."""
+) -> list[tuple[Questionnaire, int, int]]:
+    """List questionnaires with question and session counts.
 
-    statement = select(Questionnaire).order_by(Questionnaire.created_at.desc())
+    Returns (questionnaire, question_count, session_count) tuples. Counts
+    are correlated subqueries, so this remains a single database round-trip.
+    """
+
+    question_count = (
+        select(func.count(Question.id))
+        .where(Question.questionnaire_id == Questionnaire.id)
+        .correlate(Questionnaire)
+        .scalar_subquery()
+    )
+    session_count = (
+        select(func.count(QuestionnaireSession.id))
+        .where(QuestionnaireSession.questionnaire_id == Questionnaire.id)
+        .correlate(Questionnaire)
+        .scalar_subquery()
+    )
+
+    statement = (
+        select(
+            Questionnaire,
+            question_count.label("question_count"),
+            session_count.label("session_count"),
+        )
+        .order_by(Questionnaire.created_at.desc())
+    )
 
     if is_active is not None:
         statement = statement.where(Questionnaire.is_active == is_active)
@@ -126,7 +164,7 @@ async def list_questionnaires(
     statement = statement.limit(limit).offset(offset)
 
     result = await db.execute(statement)
-    return list(result.scalars().all())
+    return list(result.all())
 
 
 async def update_questionnaire(

@@ -8,6 +8,7 @@ from db.session import get_session
 from ..schemas import (
     QuestionnaireCreate,
     QuestionnaireDetailResponse,
+    QuestionnaireListResponse,
     QuestionnaireResponse,
     QuestionnaireUpdate,
 )
@@ -45,22 +46,34 @@ async def create_questionnaire_route(
 
 @router.get(
     "/",
-    response_model=list[QuestionnaireResponse],
+    response_model=list[QuestionnaireListResponse],
 )
 async def list_questionnaires_route(
     is_active: bool | None = None,
     limit: int = Query(default=100, ge=1, le=500),
     offset: int = Query(default=0, ge=0),
     db: AsyncSession = Depends(get_session),
-) -> list[QuestionnaireResponse]:
-    questionnaires = await list_questionnaires(
+) -> list[QuestionnaireListResponse]:
+    rows = await list_questionnaires(
         db,
         is_active=is_active,
         limit=limit,
         offset=offset,
     )
 
-    return [QuestionnaireResponse.model_validate(q) for q in questionnaires]
+    return [
+        QuestionnaireListResponse(
+            id=q.id,
+            slug=q.slug,
+            label=q.label,
+            version=q.version,
+            is_active=q.is_active,
+            created_at=q.created_at,
+            question_count=question_count,
+            session_count=session_count,
+        )
+        for q, question_count, session_count in rows
+    ]
 
 
 # Declared before "/{questionnaire_id}" so the literal path is matched first.

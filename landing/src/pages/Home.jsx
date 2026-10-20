@@ -11,6 +11,7 @@ import {
 } from "../components/home/Sections";
 
 import { FlowOverlay } from "../components/FlowOverlay";
+import { joinWaitlist } from "../services/api";
 
 const INITIAL_USER_DATA = {
     email: "",
@@ -36,8 +37,11 @@ export default function App() {
         }));
     };
 
-    const handleJoin = (email) => {
-        if (!email.trim()) return;
+    const handleJoin = async (email) => {
+        const trimmed = (email || "").trim();
+        if (!trimmed) return;
+
+        await joinWaitlist({email: trimmed})
 
         setUserData((prev) => ({
             ...prev,
