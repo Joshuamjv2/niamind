@@ -5,8 +5,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from .questions import bulk_create_questions
-
 from ..exceptions import (
     QuestionnaireNotFoundError,
     QuestionnaireSlugConflictError,
@@ -16,6 +14,7 @@ from ..schemas import (
     QuestionnaireCreate,
     QuestionnaireUpdate,
 )
+from .questions import bulk_create_questions
 
 
 async def create_questionnaire(

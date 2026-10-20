@@ -1,19 +1,9 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import (
-    ARRAY,
-    Boolean,
-    DateTime,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-    Index
-)
+from sqlalchemy import ARRAY, Boolean, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 
 from db.base import Base
 

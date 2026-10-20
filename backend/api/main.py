@@ -11,8 +11,8 @@ from redis_client.client import client as redis_client
 
 from .services.questionnaires.error_handlers import register_exception_handlers
 from .services.questionnaires.routes.questionnaire import router as questionnaires_router
-from .services.waitlist.routes import router as waitlist_router
 from .services.questionnaires.routes.questions import router as questions_router
+from .services.waitlist.routes import router as waitlist_router
 
 app = FastAPI(
     title=settings.APP_NAME,
