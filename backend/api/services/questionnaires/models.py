@@ -163,7 +163,9 @@ class QuestionnaireSession(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4,
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
     )
 
     questionnaire_id: Mapped[uuid.UUID] = mapped_column(
@@ -186,18 +188,22 @@ class QuestionnaireSession(Base):
 
     questionnaire: Mapped["Questionnaire"] = relationship("Questionnaire", back_populates="sessions")
     answers: Mapped[list["Answer"]] = relationship(
-        "Answer", back_populates="session", cascade="all, delete-orphan",
+        "Answer",
+        back_populates="session",
+        cascade="all, delete-orphan",
     )
 
 
 class Answer(Base):
     __tablename__ = "answers"
 
-    __table_args__ = (UniqueConstraint(
+    __table_args__ = (
+        UniqueConstraint(
             "session_id",
             "question_id",
             name="uq_answers_session_question",
-        ),)
+        ),
+    )
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,

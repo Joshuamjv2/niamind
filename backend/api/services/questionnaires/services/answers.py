@@ -1,4 +1,3 @@
-
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -23,9 +22,7 @@ async def _get_session(
     session = await db.get(QuestionnaireSession, session_id)
 
     if session is None:
-        raise QuestionnaireSessionNotFoundError(
-            f"Questionnaire session '{session_id}' was not found."
-        )
+        raise QuestionnaireSessionNotFoundError(f"Questionnaire session '{session_id}' was not found.")
 
     return session
 
@@ -215,11 +212,7 @@ async def list_session_answers(
 ) -> list[Answer]:
     await _get_session(db, session_id)
 
-    result = await db.scalars(
-        select(Answer)
-        .where(Answer.session_id == session_id)
-        .order_by(Answer.created_at, Answer.id)
-    )
+    result = await db.scalars(select(Answer).where(Answer.session_id == session_id).order_by(Answer.created_at, Answer.id))
 
     return list(result.all())
 

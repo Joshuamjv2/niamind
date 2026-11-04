@@ -1,4 +1,3 @@
-
 from uuid import UUID, uuid4
 
 import pytest
@@ -87,11 +86,7 @@ async def test_create_questionnaire_session(
     assert data["completed_gate"] is False
     assert data["completed_at"] is None
 
-    result = await db.execute(
-        select(QuestionnaireSession).where(
-            QuestionnaireSession.id == UUID(data["id"])
-        )
-    )
+    result = await db.execute(select(QuestionnaireSession).where(QuestionnaireSession.id == UUID(data["id"])))
     session = result.scalar_one()
 
     assert session.questionnaire_id == UUID(questionnaire["id"])
@@ -251,11 +246,7 @@ async def test_complete_session_rejects_unanswered_required_question(
 
     assert response.status_code == 422
 
-    result = await db.execute(
-        select(QuestionnaireSession.completed_at).where(
-            QuestionnaireSession.id == UUID(session_id)
-        )
-    )
+    result = await db.execute(select(QuestionnaireSession.completed_at).where(QuestionnaireSession.id == UUID(session_id)))
     assert result.scalar_one() is None
 
 

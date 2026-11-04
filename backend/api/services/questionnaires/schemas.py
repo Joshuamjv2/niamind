@@ -62,13 +62,14 @@ class StrippedModel(BaseModel):
 # Question schemas
 # ---------------------------------------------------------------------------
 
+
 class QuestionBase(StrippedModel):
     key: str = Field(min_length=1, max_length=255)
     text: str = Field(min_length=1)
     placeholder: str | None = None
     type: QuestionType = "text"
     options: list[str] | None = None
-    order: int | None = Field(default=None, ge=0)   # optional for nested create
+    order: int | None = Field(default=None, ge=0)  # optional for nested create
     required: bool = False
     is_active: bool = True
 
@@ -156,6 +157,7 @@ class QuestionResponse(BaseModel):
 # Questionnaire schemas
 # ---------------------------------------------------------------------------
 
+
 class QuestionNested(QuestionBase):
     """Question embedded in a questionnaire create payload."""
 
@@ -232,6 +234,7 @@ class QuestionnaireSessionComplete(BaseModel):
 
 class QuestionnaireListResponse(QuestionnaireResponse):
     """List response that includes per-questionnaire rollup counts."""
+
     question_count: int
     session_count: int
 
@@ -255,9 +258,7 @@ class AnswerPayload(BaseModel):
         has_array = self.answer_array is not None
 
         if has_text == has_array:
-            raise ValueError(
-                "Provide exactly one of answer_text or answer_array."
-            )
+            raise ValueError("Provide exactly one of answer_text or answer_array.")
 
         return self
 
@@ -273,9 +274,7 @@ class AnswerCreate(BaseModel):
         has_array = self.answer_array is not None
 
         if has_text == has_array:
-            raise ValueError(
-                "Provide exactly one of answer_text or answer_array."
-            )
+            raise ValueError("Provide exactly one of answer_text or answer_array.")
 
         return self
 
@@ -290,9 +289,7 @@ class AnswerUpdate(BaseModel):
         has_array = self.answer_array is not None
 
         if has_text == has_array:
-            raise ValueError(
-                "Provide exactly one of answer_text or answer_array."
-            )
+            raise ValueError("Provide exactly one of answer_text or answer_array.")
 
         return self
 

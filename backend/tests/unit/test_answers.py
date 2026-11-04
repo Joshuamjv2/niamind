@@ -1,4 +1,3 @@
-
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -135,9 +134,7 @@ async def test_save_multiselect_answer(db, answer_setup):
 
 
 @pytest.mark.asyncio
-async def test_saving_answer_again_updates_existing_answer(
-    db, answer_setup
-):
+async def test_saving_answer_again_updates_existing_answer(db, answer_setup):
     data = answer_setup
     session_id = data["session"].id
     question_id = data["text_question"].id
@@ -192,9 +189,7 @@ async def test_rejects_invalid_selection(db, answer_setup):
 
 
 @pytest.mark.asyncio
-async def test_rejects_multiple_options_for_single_select(
-    db, answer_setup
-):
+async def test_rejects_multiple_options_for_single_select(db, answer_setup):
     data = answer_setup
 
     with pytest.raises(HTTPException) as exc:
@@ -211,9 +206,7 @@ async def test_rejects_multiple_options_for_single_select(
 
 
 @pytest.mark.asyncio
-async def test_rejects_duplicate_multiselect_options(
-    db, answer_setup
-):
+async def test_rejects_duplicate_multiselect_options(db, answer_setup):
     data = answer_setup
 
     with pytest.raises(HTTPException) as exc:
@@ -230,9 +223,7 @@ async def test_rejects_duplicate_multiselect_options(
 
 
 @pytest.mark.asyncio
-async def test_rejects_question_from_another_questionnaire(
-    db, answer_setup
-):
+async def test_rejects_question_from_another_questionnaire(db, answer_setup):
     data = answer_setup
 
     other_questionnaire = Questionnaire(

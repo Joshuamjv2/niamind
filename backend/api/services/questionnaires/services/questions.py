@@ -63,11 +63,7 @@ async def list_questions_for_questionnaire(
     *,
     include_inactive: bool = False,
 ) -> list[Question]:
-    statement = (
-        select(Question)
-        .where(Question.questionnaire_id == questionnaire_id)
-        .order_by(Question.order)
-    )
+    statement = select(Question).where(Question.questionnaire_id == questionnaire_id).order_by(Question.order)
     if not include_inactive:
         statement = statement.where(Question.is_active.is_(True))
 
@@ -100,11 +96,7 @@ async def update_question(
 
 
 async def question_has_answers(db: AsyncSession, question_id: UUID) -> bool:
-    count = await db.scalar(
-        select(func.count())
-        .select_from(Answer)
-        .where(Answer.question_id == question_id)
-    )
+    count = await db.scalar(select(func.count()).select_from(Answer).where(Answer.question_id == question_id))
     return (count or 0) > 0
 
 

@@ -21,17 +21,11 @@ async def create_questionnaire(
     db: AsyncSession,
     data: QuestionnaireCreate,
 ) -> Questionnaire:
-    existing = await db.scalar(
-        select(Questionnaire.id).where(Questionnaire.slug == data.slug)
-    )
+    existing = await db.scalar(select(Questionnaire.id).where(Questionnaire.slug == data.slug))
     if existing is not None:
-        raise QuestionnaireSlugConflictError(
-            f"A questionnaire with slug '{data.slug}' already exists."
-        )
+        raise QuestionnaireSlugConflictError(f"A questionnaire with slug '{data.slug}' already exists.")
 
-    questionnaire = Questionnaire(
-        **data.model_dump(exclude={"questions"})
-    )
+    questionnaire = Questionnaire(**data.model_dump(exclude={"questions"}))
     db.add(questionnaire)
 
     try:
@@ -47,9 +41,7 @@ async def create_questionnaire(
         return questionnaire
     except IntegrityError as exc:
         await db.rollback()
-        raise QuestionnaireSlugConflictError(
-            f"A questionnaire with slug '{data.slug}' already exists."
-        ) from exc
+        raise QuestionnaireSlugConflictError(f"A questionnaire with slug '{data.slug}' already exists.") from exc
     except Exception:
         await db.rollback()
         raise
@@ -135,27 +127,14 @@ async def list_questionnaires(
     are correlated subqueries, so this remains a single database round-trip.
     """
 
-    question_count = (
-        select(func.count(Question.id))
-        .where(Question.questionnaire_id == Questionnaire.id)
-        .correlate(Questionnaire)
-        .scalar_subquery()
-    )
-    session_count = (
-        select(func.count(QuestionnaireSession.id))
-        .where(QuestionnaireSession.questionnaire_id == Questionnaire.id)
-        .correlate(Questionnaire)
-        .scalar_subquery()
-    )
+    question_count = select(func.count(Question.id)).where(Question.questionnaire_id == Questionnaire.id).correlate(Questionnaire).scalar_subquery()
+    session_count = select(func.count(QuestionnaireSession.id)).where(QuestionnaireSession.questionnaire_id == Questionnaire.id).correlate(Questionnaire).scalar_subquery()
 
-    statement = (
-        select(
-            Questionnaire,
-            question_count.label("question_count"),
-            session_count.label("session_count"),
-        )
-        .order_by(Questionnaire.created_at.desc())
-    )
+    statement = select(
+        Questionnaire,
+        question_count.label("question_count"),
+        session_count.label("session_count"),
+    ).order_by(Questionnaire.created_at.desc())
 
     if is_active is not None:
         statement = statement.where(Questionnaire.is_active == is_active)

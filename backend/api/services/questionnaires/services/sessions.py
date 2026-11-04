@@ -1,4 +1,3 @@
-
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -27,14 +26,10 @@ async def create_questionnaire_session(
     questionnaire = await db.get(Questionnaire, questionnaire_id)
 
     if questionnaire is None:
-        raise QuestionnaireNotFoundError(
-            f"Questionnaire '{questionnaire_id}' was not found."
-        )
+        raise QuestionnaireNotFoundError(f"Questionnaire '{questionnaire_id}' was not found.")
 
     if not questionnaire.is_active:
-        raise QuestionnaireInactiveError(
-            f"Questionnaire '{questionnaire_id}' is not active."
-        )
+        raise QuestionnaireInactiveError(f"Questionnaire '{questionnaire_id}' is not active.")
 
     session = QuestionnaireSession(
         questionnaire_id=questionnaire_id,
@@ -59,9 +54,7 @@ async def get_questionnaire_session(
     session = await db.get(QuestionnaireSession, session_id)
 
     if session is None:
-        raise QuestionnaireSessionNotFoundError(
-            f"Questionnaire session '{session_id}' was not found."
-        )
+        raise QuestionnaireSessionNotFoundError(f"Questionnaire session '{session_id}' was not found.")
 
     return session
 
@@ -85,13 +78,8 @@ async def complete_questionnaire_session(
     )
     questions = list(required_questions.all())
 
-    answers_result = await db.scalars(
-        select(Answer).where(Answer.session_id == session_id)
-    )
-    answers_by_question = {
-        answer.question_id: answer
-        for answer in answers_result.all()
-    }
+    answers_result = await db.scalars(select(Answer).where(Answer.session_id == session_id))
+    answers_by_question = {answer.question_id: answer for answer in answers_result.all()}
 
     unanswered_ids: list[UUID] = []
 
@@ -103,9 +91,7 @@ async def complete_questionnaire_session(
             continue
 
         if question.type == "text":
-            has_answer = bool(
-                answer.answer_text and answer.answer_text.strip()
-            )
+            has_answer = bool(answer.answer_text and answer.answer_text.strip())
         else:
             has_answer = bool(answer.answer_array)
 
@@ -113,10 +99,7 @@ async def complete_questionnaire_session(
             unanswered_ids.append(question.id)
 
     if unanswered_ids:
-        raise RequiredQuestionUnansweredError(
-            "Cannot complete the questionnaire. "
-            f"Required questions remain unanswered: {unanswered_ids}"
-        )
+        raise RequiredQuestionUnansweredError(f"Cannot complete the questionnaire. Required questions remain unanswered: {unanswered_ids}")
 
     try:
         session.completed_at = utc_now()
