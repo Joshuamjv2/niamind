@@ -269,54 +269,26 @@ function QuestionRow({ question, sessions, onEdit, onDelete, isDeleting }) {
 
     return (
         <div className="bg-white rounded-2xl border border-niamind-border shadow-soft overflow-hidden">
-            <div className="flex items-start gap-3 p-4">
-                <button
-                    onClick={() => setOpen((v) => !v)}
-                    className="flex-1 flex items-start gap-3 text-left min-w-0"
-                >
+            <div className="flex items-start gap-3 p-4 ">
+                <button onClick={() => setOpen((v) => !v)} className="flex-1 flex items-start gap-3 text-left min-w-0">
                     <span className="inline-flex items-center justify-center h-7 min-w-7 px-2 rounded-md bg-niamind-teal/10 text-xs font-mono font-semibold text-niamind-teal shrink-0">
                         #{question.order + 1}
                     </span>
                     <div className="min-w-0 flex-1">
                         <p className="font-semibold text-niamind-text">{question.text}</p>
-                        <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                        <div className="flex flex-wrap items-center gap-2 mt-2.5">
                             <Badge variant="secondary" className="text-[10px]">
                                 {typeLabel(question.type)}
                             </Badge>
-                            {question.required && (
-                                <Badge className="text-[10px] bg-niamind-gold/15 text-niamind-gold hover:bg-niamind-gold/15">
-                                    Required
-                                </Badge>
-                            )}
-                            <span className="text-xs text-niamind-muted font-mono">
-                                {question.key}
-                            </span>
+                            {question.required && <Badge className="text-[10px] bg-niamind-gold/15 text-niamind-gold hover:bg-niamind-gold/15">Required</Badge>}
+                            <span className="text-xs text-niamind-muted font-mono hidden">{question.key}</span>
+
                         </div>
                     </div>
                 </button>
 
-                <div className="flex items-center gap-1 shrink-0">
-                    <button
-                        type="button"
-                        onClick={onEdit}
-                        aria-label="Edit question"
-                        className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-niamind-muted hover:text-niamind-gold hover:bg-niamind-gold/10 transition"
-                    >
-                        <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
-                        type="button"
-                        onClick={onDelete}
-                        disabled={isDeleting}
-                        aria-label="Delete question"
-                        className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-niamind-coral hover:bg-niamind-coral/10 transition disabled:opacity-50"
-                    >
-                        {isDeleting ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <Trash2 className="h-4 w-4" />
-                        )}
-                    </button>
+
+                <div className="flex items-end flex-col gap-1 shrink-0 rounded-md bg-white shadow-xl p-2">
                     <button
                         type="button"
                         onClick={() => setOpen((v) => !v)}
@@ -325,6 +297,25 @@ function QuestionRow({ question, sessions, onEdit, onDelete, isDeleting }) {
                     >
                         {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                     </button>
+                    <div>
+                        <button
+                            type="button"
+                            onClick={onEdit}
+                            aria-label="Edit question"
+                            className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-niamind-muted hover:text-niamind-gold hover:bg-niamind-gold/10 transition"
+                        >
+                            <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onDelete}
+                            disabled={isDeleting}
+                            aria-label="Delete question"
+                            className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-niamind-coral hover:bg-niamind-coral/10 transition disabled:opacity-50"
+                        >
+                            {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                        </button>
+                    </div>
                 </div>
             </div>
 
