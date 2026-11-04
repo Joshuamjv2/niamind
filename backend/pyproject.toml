@@ -10,6 +10,9 @@ requires-python = "==3.12.*"
 [tool.ruff]
 line-length = 252
 
+[tool.fastapi]
+entrypoint = "api.main:app"
+
 [tool.ruff.lint]
 select = ["E", "F", "I"]
 
