@@ -12,3 +12,4 @@ max-line-length = 252
 
 [tool.pytest.ini_options]
 addopts = "--cache-clear"
+asyncio_mode = "auto"

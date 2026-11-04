@@ -41,7 +41,7 @@ services:
       dockerfile: Dockerfile
 
     container_name: niamind-api
-    restart: always
+    restart: on-failure
 
     depends_on:
       db:
@@ -71,7 +71,7 @@ services:
       dockerfile: Dockerfile
 
     container_name: niamind-celery-worker
-    restart: always
+    restart: on-failure
 
     command: >
       celery
@@ -124,7 +124,7 @@ services:
       dockerfile: Dockerfile
 
     container_name: niamind-flower
-    restart: always
+    restart: on-failure
 
     command: >
       celery
@@ -185,7 +185,7 @@ services:
   redis:
     image: redis:7.2-alpine
     container_name: niamind-redis
-    restart: always
+    restart: on-failure
 
     command: >
       redis-server

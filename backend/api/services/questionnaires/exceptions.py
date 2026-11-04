@@ -11,3 +11,15 @@ class QuestionnaireSlugConflictError(Exception):
 
 class QuestionNotFoundError(Exception):
     """Raised when a questionnaire slug is already in use."""
+
+
+class QuestionnaireInactiveError(Exception):
+    pass
+
+
+class QuestionnaireSessionNotFoundError(Exception):
+    pass
+
+
+class RequiredQuestionUnansweredError(Exception):
+    pass

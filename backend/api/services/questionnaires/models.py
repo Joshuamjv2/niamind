@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import ARRAY, Boolean, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import ARRAY, Boolean, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -179,6 +179,7 @@ class QuestionnaireSession(Base):
     email: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
 
     completed_gate: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # last_stop: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now)
@@ -192,6 +193,11 @@ class QuestionnaireSession(Base):
 class Answer(Base):
     __tablename__ = "answers"
 
+    __table_args__ = (UniqueConstraint(
+            "session_id",
+            "question_id",
+            name="uq_answers_session_question",
+        ),)
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,

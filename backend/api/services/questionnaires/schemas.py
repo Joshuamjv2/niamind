@@ -207,15 +207,19 @@ class QuestionnaireDetailResponse(QuestionnaireResponse):
 
 class QuestionnaireSessionCreate(BaseModel):
     questionnaire_id: UUID
-    waitlist_entry_id: UUID | None = None
+    # waitlist_entry_id: UUID | None = None
+    name: str | None = Field(default=None, max_length=255)
+    email: str | None = None
 
 
 class QuestionnaireSessionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    name: str | None = Field(default=None, max_length=255)
+    email: str | None = None
 
     id: UUID
     questionnaire_id: UUID
-    waitlist_entry_id: UUID | None
+    # waitlist_entry_id: UUID | None
     completed_gate: bool
     completed_at: datetime | None
     created_at: datetime
@@ -228,11 +232,13 @@ class QuestionnaireSessionComplete(BaseModel):
 
 class QuestionnaireListResponse(QuestionnaireResponse):
     """List response that includes per-questionnaire rollup counts."""
-
     question_count: int
     session_count: int
 
 
+# ---------------------------------------------------------------------------
+# Answer schemas
+# ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # Answer schemas
 # ---------------------------------------------------------------------------
@@ -249,13 +255,29 @@ class AnswerPayload(BaseModel):
         has_array = self.answer_array is not None
 
         if has_text == has_array:
-            raise ValueError("Provide exactly one of answer_text or answer_array.")
+            raise ValueError(
+                "Provide exactly one of answer_text or answer_array."
+            )
 
         return self
 
 
-class AnswerCreate(AnswerPayload):
-    pass
+class AnswerCreate(BaseModel):
+    question_id: UUID
+    answer_text: str | None = None
+    answer_array: list[str] | None = None
+
+    @model_validator(mode="after")
+    def validate_answer_value(self) -> "AnswerCreate":
+        has_text = self.answer_text is not None
+        has_array = self.answer_array is not None
+
+        if has_text == has_array:
+            raise ValueError(
+                "Provide exactly one of answer_text or answer_array."
+            )
+
+        return self
 
 
 class AnswerUpdate(BaseModel):
@@ -268,7 +290,9 @@ class AnswerUpdate(BaseModel):
         has_array = self.answer_array is not None
 
         if has_text == has_array:
-            raise ValueError("Provide exactly one of answer_text or answer_array.")
+            raise ValueError(
+                "Provide exactly one of answer_text or answer_array."
+            )
 
         return self
 
@@ -279,7 +303,7 @@ class AnswerResponse(BaseModel):
     id: UUID
     session_id: UUID
     question_id: UUID
-    answer_text: str | None
-    answer_array: list[str] | None
+    answer_text: str | None = None
+    answer_array: list[str] | None = None
     created_at: datetime
     updated_at: datetime
