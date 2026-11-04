@@ -1,7 +1,11 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "niamind-backend"
 version = "0.1.0"
-requires-python = ">=3.12"
+requires-python = "==3.12.*"
 
 [tool.ruff]
 line-length = 252
@@ -18,3 +22,13 @@ max-line-length = 252
 [tool.pytest.ini_options]
 addopts = "--cache-clear"
 asyncio_mode = "auto"
+
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "api*",
+    "db*",
+    "migrations*",
+    "redis_client*",
+]
