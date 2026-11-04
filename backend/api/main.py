@@ -29,7 +29,7 @@ register_exception_handlers(app)
 
 app.add_middleware(
     TrustedHostMiddleware,
-    # allowed_hosts=[host.strip() for host in settings.ALLOWED_HOSTS.split(",") if host.strip()],
+    allowed_hosts=[host.strip() for host in settings.ALLOWED_HOSTS.split(",") if host.strip()],
 )
 
 app.add_middleware(
