@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from pydantic import Field
@@ -66,7 +67,7 @@ class Settings(BaseSettings):
 
     # ── Pydantic Settings ─────────────────────────────────────
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=".env" if os.getenv("APP_ENV", "development") == "development" else None,
         env_file_encoding="utf-8",
         extra="ignore",
     )
