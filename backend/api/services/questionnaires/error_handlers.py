@@ -2,10 +2,10 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from .exceptions import (
-    QuestionnaireNotFoundError,
-    QuestionnaireSlugConflictError,
     QuestionnaireInactiveError,
+    QuestionnaireNotFoundError,
     QuestionnaireSessionNotFoundError,
+    QuestionnaireSlugConflictError,
     RequiredQuestionUnansweredError,
 )
 
